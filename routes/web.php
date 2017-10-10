@@ -14,3 +14,20 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+
+Route::prefix('admin')->group(function() {
+    Route::get('/', 'AdminController@index')->name('admin');
+    
+    Route::prefix('users')->group(function() {
+        Route::get('/', 'UserController@index')->name('users');
+        
+        Route::get('/edit/{user}', 'UserController@form')->name('user.edit');
+        
+        Route::get('/new', 'UserController@form')->name('user.new');
+        
+        Route::post('/save', 'UserController@save')->name('user.save');
+    });
+});
