@@ -33,7 +33,7 @@
                 @foreach ($users as $user)
                     <tr>
                         <td>
-                            <a href="{{ route('user.edit', $user) }}">Edit</a>
+                            <a href="{{ route('user.edit', $user) }}" class="btn btn-primary">Edit</a>
                         </td>
                         <td>
                             {{ $user->name }}
@@ -42,7 +42,10 @@
                             {{ $user->email }}
                         </td>
                         <td>
-                            {{ $user->active }}
+                            <form method="POST" action="{{ $user->trashed() ? route('user.restore', $user) : route('user.delete', $user) }}">
+                                {{ csrf_field() }}
+                                <input class="btn btn-default" type="submit" value="{{ $user->active }}">
+                            </form>
                         </td>
                     </tr>
                 @endforeach

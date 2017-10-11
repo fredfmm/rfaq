@@ -30,6 +30,10 @@ Route::prefix('admin')->group(function() {
         
         Route::post('/save', 'UserController@save')->name('user.save');
         
-        Route::post('/update/{user}', 'UserController@update')->name('user.update');
+        Route::post('/update/{user}', 'UserController@save')->name('user.update');
+
+        Route::post('/inactivate/{user}', 'UserController@destroy')->name('user.delete');
+
+        Route::post('/activate/{id}', 'UserController@restore')->name('user.restore');
     });
 });

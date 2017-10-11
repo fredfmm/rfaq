@@ -35,7 +35,7 @@ class UserController extends Controller
                            ->paginate(15)
                            ->appends($request->input());
         } else {
-            $users = User::paginate(15);
+            $users = User::withTrashed()->paginate(15);
         }
 
         return view('user.index', compact('users', $users));
@@ -63,7 +63,7 @@ class UserController extends Controller
     }
 
     /**
-     * Save an user
+     * Save or update an user
      *
      * @param SaveUserRequest $request
      * @param User $user
@@ -72,22 +72,6 @@ class UserController extends Controller
      */
     public function save(SaveUserRequest $request, User $user)
     {
-        $user->fill($request->all());
-        $user->save();
-
-        return redirect()->route('user.edit', [$user])->with('success', 'User saved.');
-    }
-
-    /**
-     * Update an user
-     *
-     * @param SaveUserRequest $request
-     * @param User $user
-     * 
-     * @return void
-     */
-    public function update(SaveUserRequest $request, User $user)
-    {
         $user->name = $request->name;
         $user->email = $request->email;
         if (!is_null($request->password)) {
@@ -95,16 +79,33 @@ class UserController extends Controller
         }
         $user->save();
 
-        return redirect()->route('user.edit', [$user])->with('success', 'User updated.');
+        return redirect()->route('user.edit', [$user])->with('success', 'User saved.');
     }
 
     /**
-     * Deletes an user.
+     * Inactivate an user.
      *
+     * @param User $user
+     * 
      * @return void
      */
-    public function destroy()
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return redirect()->route('users')->with('success', 'User ' . $user->name . ' inactivated.');
+    }
+
+    /**
+     * Restore an user.
+     *
+     * @param int $id
+     * 
+     * @return void
+     */
+    public function restore(int $id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+        return redirect()->route('users')->with('success', 'User ' . $user->name . ' reactivated.');
     }
 }
