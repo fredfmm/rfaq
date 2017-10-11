@@ -29,7 +29,24 @@ class User extends Authenticatable
     ];
 
     protected $dates = ['deleted_at'];
+    
+    /**
+     * Set the hash of the password to the model
+     *
+     * @param string $password
+     * 
+     * @return void
+     */
+    public function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = bcrypt($password);
+    }
 
+    /**
+     * Return the user status.
+     *
+     * @return void
+     */
     public function getActiveAttribute()
     {
         return is_null($this->deleted_at) ? 'Active' : 'Inactive';

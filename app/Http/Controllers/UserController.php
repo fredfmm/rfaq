@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use \App\Http\Requests\SaveUserRequest;
 use \App\User;
 
 class UserController extends Controller
@@ -30,6 +31,7 @@ class UserController extends Controller
         if ($search) {
             $users = User::where('email', 'LIKE', '%' . $search . '%')
                            ->orWhere('name', 'LIKE', '%' . $search . '%')
+                           ->withTrashed()
                            ->paginate(15)
                            ->appends($request->input());
         } else {
@@ -61,23 +63,39 @@ class UserController extends Controller
     }
 
     /**
-     * Save or update an user
+     * Save an user
      *
-     * @param Request $request
+     * @param SaveUserRequest $request
+     * @param User $user
+     * 
      * @return void
      */
-    public function save(Request $request)
+    public function save(SaveUserRequest $request, User $user)
     {
-        $request->validate($this->userValidation());
-
-        $user = User::firstOrNew(['email' => $request->email]);
-
-        $user->name = $request->name;
-        $user->password = bcrypt($request->password);
-
+        $user->fill($request->all());
         $user->save();
 
         return redirect()->route('user.edit', [$user])->with('success', 'User saved.');
+    }
+
+    /**
+     * Update an user
+     *
+     * @param SaveUserRequest $request
+     * @param User $user
+     * 
+     * @return void
+     */
+    public function update(SaveUserRequest $request, User $user)
+    {
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if (!is_null($request->password)) {
+            $user->password = $request->password;
+        }
+        $user->save();
+
+        return redirect()->route('user.edit', [$user])->with('success', 'User updated.');
     }
 
     /**
@@ -88,14 +106,5 @@ class UserController extends Controller
     public function destroy()
     {
         //
-    }
-
-    protected function userValidation()
-    {
-        return [
-            "name" => "required|min:3|max:255",
-            "password" => "required|min:6|max:255|confirmed",
-            "email" => "email|required"
-        ];
     }
 }

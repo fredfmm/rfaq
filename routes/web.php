@@ -29,5 +29,7 @@ Route::prefix('admin')->group(function() {
         Route::get('/new', 'UserController@form')->name('user.new');
         
         Route::post('/save', 'UserController@save')->name('user.save');
+        
+        Route::post('/update/{user}', 'UserController@update')->name('user.update');
     });
 });
