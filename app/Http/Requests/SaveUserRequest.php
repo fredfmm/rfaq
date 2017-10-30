@@ -29,7 +29,7 @@ class SaveUserRequest extends FormRequest
             "email"    => "email|required|unique:users,email" . ($this->user ? "," . $this->user->id : "")
         ];
 
-        if (route('user.new') == $this->getRedirectUrl()) {
+        if (route('users.create') == $this->getRedirectUrl()) {
             $rules["password"] = "required|" . $rules["password"];
         } else {
             $rules["password"] = "nullable|" . $rules["password"];

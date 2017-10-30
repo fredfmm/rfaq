@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <a href="{{ route('user.new') }}" class="btn btn-primary" role="button">New User</a>
+        <a href="{{ route('users.create') }}" class="btn btn-primary" role="button">New User</a>
         <hr />
         <form method="GET">
             <div class="input-group">
@@ -33,7 +33,7 @@
                 @foreach ($users as $user)
                     <tr>
                         <td>
-                            <a href="{{ route('user.edit', $user) }}" class="btn btn-primary">Edit</a>
+                            <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">Edit</a>
                         </td>
                         <td>
                             {{ $user->name }}
@@ -42,7 +42,7 @@
                             {{ $user->email }}
                         </td>
                         <td>
-                            <form method="POST" action="{{ $user->trashed() ? route('user.restore', $user) : route('user.delete', $user) }}">
+                            <form method="POST" action="{{ $user->trashed() ? route('users.activate', $user) : route('users.inactivate', $user) }}">
                                 {{ csrf_field() }}
                                 <input class="btn btn-default" type="submit" value="{{ $user->active }}">
                             </form>

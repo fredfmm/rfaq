@@ -2,27 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Http\Requests\SaveUserRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use \App\Http\Requests\SaveUserRequest;
-use \App\User;
 
 class UserController extends Controller
 {
     /**
-     * Create a new controller instance.
+     * Display a listing of the resource.
      *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * List all users.
-     *
-     * @return void
+     * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
@@ -38,24 +27,37 @@ class UserController extends Controller
             $users = User::withTrashed()->paginate(15);
         }
 
-        return view('user.index', compact('users', $users));
+        return view('admin.users.index', compact('users', $users));
     }
 
     /**
-     * Show the user save/edit form.
+     * Show the form for creating a new resource.
      *
-     * @return void
+     * @return \Illuminate\Http\Response
      */
-    public function form(User $user)
+    public function create()
     {
-        return view('user.form', compact('user', $user));
+        return view('admin.users.form');
     }
 
     /**
-     * Show a specific user
+     * Store a newly created resource in storage.
      *
-     * @param User $user
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(SaveUserRequest $request)
+    {
+        $user = User::create($request->all());
+        
+        return redirect()->route('users.edit', $user)->with('success', 'User '. $user->name .' successfuly created.');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
      */
     public function show(User $user)
     {
@@ -63,14 +65,24 @@ class UserController extends Controller
     }
 
     /**
-     * Save or update an user
+     * Show the form for editing the specified resource.
      *
-     * @param SaveUserRequest $request
-     * @param User $user
-     * 
-     * @return void
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
      */
-    public function save(SaveUserRequest $request, User $user)
+    public function edit(User $user)
+    {
+        return view('admin.users.form', compact('user', $user));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function update(SaveUserRequest $request, User $user)
     {
         $user->name = $request->name;
         $user->email = $request->email;
@@ -78,34 +90,47 @@ class UserController extends Controller
             $user->password = $request->password;
         }
         $user->save();
-
-        return redirect()->route('user.edit', [$user])->with('success', 'User saved.');
+        
+        return redirect()->back()->with('success', 'User updated.');
     }
 
     /**
-     * Inactivate an user.
+     * Remove the specified resource from storage.
      *
-     * @param User $user
-     * 
-     * @return void
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
      */
     public function destroy(User $user)
     {
-        $user->delete();
-        return redirect()->route('users')->with('success', 'User ' . $user->name . ' inactivated.');
+        return abort(503);
     }
-
+    
     /**
-     * Restore an user.
+     * Inactivate the specified resource from storage.
      *
-     * @param int $id
-     * 
-     * @return void
+     * @param  \App\User  $user
+     * @return \Illuminate\Http\Response
      */
-    public function restore(int $id)
+    public function inactivate(User $user)
+    {
+        if ($user->id == auth()->id()) { 
+            return redirect()->route('users.index')->withErrors("Can't inactivate your own user."); 
+        } 
+
+        $user->delete();
+        return redirect()->route('users.index')->with('success', 'User ' . $user->name . ' inactivated.');
+    }
+    
+    /**
+     * Activate the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function activate(int $id)
     {
         $user = User::withTrashed()->findOrFail($id);
         $user->restore();
-        return redirect()->route('users')->with('success', 'User ' . $user->name . ' reactivated.');
+        return redirect()->route('users.index')->with('success', 'User ' . $user->name . ' reactivated.');
     }
 }

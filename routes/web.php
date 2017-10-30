@@ -18,22 +18,15 @@ Route::get('/', function () {
 Auth::routes();
 
 
-Route::prefix('admin')->group(function() {
+Route::middleware(['auth'])->prefix('admin')->group(function() {
     Route::get('/', 'AdminController@index')->name('admin');
     
-    Route::prefix('users')->group(function() {
-        Route::get('/', 'UserController@index')->name('users');
-        
-        Route::get('/edit/{user}', 'UserController@form')->name('user.edit');
-        
-        Route::get('/new', 'UserController@form')->name('user.new');
-        
-        Route::post('/save', 'UserController@save')->name('user.save');
-        
-        Route::post('/update/{user}', 'UserController@save')->name('user.update');
+    Route::resource('/users', 'UserController');
+    Route::prefix('/users')->group(function() {
+        Route::post('/inactivate/{user}', 'UserController@inactivate')->name('users.inactivate');
 
-        Route::post('/inactivate/{user}', 'UserController@destroy')->name('user.delete');
-
-        Route::post('/activate/{id}', 'UserController@restore')->name('user.restore');
+        Route::post('/activate/{id}', 'UserController@activate')->name('users.activate');
     });
+
+    Route::resource('/questions', 'QuestionController');
 });
