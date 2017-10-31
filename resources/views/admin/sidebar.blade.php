@@ -4,7 +4,7 @@
             <a class="nav-link{{ url()->current() == route('questions.index') ? " active" : "" }}" href="{{ route('questions.index') }}">Questions</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link disabled" href="#">Categories</a>
+            <a class="nav-link{{ url()->current() == route('categories.index') ? " active" : "" }}" href="{{ route('categories.index') }}">Categories</a>
         </li>
         <li class="nav-item">
             <a class="nav-link{{ url()->current() == route('users.index') ? " active" : "" }}" href="{{ route('users.index') }}">Users</a>

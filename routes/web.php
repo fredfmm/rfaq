@@ -28,5 +28,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function() {
         Route::post('/activate/{id}', 'UserController@activate')->name('users.activate');
     });
 
+    Route::resource('/categories', 'CategoryController');
+
     Route::resource('/questions', 'QuestionController');
 });
