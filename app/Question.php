@@ -9,6 +9,15 @@ use \App\Tag;
 
 class Question extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'question_text', "category_id"
+    ];
+
     public function answer()
     {
         return $this->hasOne(Answer::class);
@@ -16,7 +25,7 @@ class Question extends Model
 
     public function category()
     {
-        return $this->hasOne(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function tags()
