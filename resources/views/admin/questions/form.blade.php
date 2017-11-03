@@ -21,8 +21,8 @@
                 @endforeach
             </select>
             <hr />
-            <label for="tag_name">Tags</label>
-            <input type="text" name="tag_name" class="form-control" id="tag_name" placeholder="Enter tags" value="{{ isset($question) ? implode(', ', $question->tags->all()) : old('tag_name') }}">
+            <label for="tags">Tags</label>
+            <input type="text" name="tags" class="form-control" id="tags" placeholder="Enter tags" value="{{ isset($question) ? implode(', ', $question->tags->pluck('tag_name')->all()) : old('tags') }}">
             <hr />
             <label for="question_text">Question</label>
             <textarea name="question_text" id="question_text" class="form-control" rows="5">{{ isset($question) ? $question->question_text : old('question_text') }}</textarea>

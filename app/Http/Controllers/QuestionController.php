@@ -8,6 +8,7 @@ use \App\Http\Requests\SaveQuestionRequest;
 use \App\Question;
 use \App\Category;
 use \App\Answer;
+use \App\Tag;
 
 class QuestionController extends Controller
 {
@@ -20,13 +21,13 @@ class QuestionController extends Controller
     {
         $search = $request->query('search');
 
-        $questions = Question::orderBy('question_text');
+        $questions = Question::orderBy('id');
         if ($search) {
-            $questions = $questions->where('question_text', 'LIKE', '%' . $search . '%');
+            $questions->where('question_text', 'LIKE', '%' . $search . '%');
         }
 
         $questions = $questions->paginate(15)
-                                 ->appends($request->input());
+                               ->appends($request->input());
 
         return view('admin.questions.index', compact('questions', $questions));
     }
@@ -54,6 +55,7 @@ class QuestionController extends Controller
         try {
             $question = Question::create($request->all());
             $answer = Answer::create(array_merge(["question_id" => $question->id], $request->all()));
+            $this->saveTags($request->tags, $question);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -95,7 +97,9 @@ class QuestionController extends Controller
      */
     public function update(SaveQuestionRequest $request, Question $question)
     {
-        // TO DO
+        $question->update($request->all());
+        $question->answer->update($request->all());
+        $this->saveTags($request->tags, $question);
         
         return redirect()->back()->with('success', 'Question '. $question->id . ' updated.');
     }
@@ -111,5 +115,28 @@ class QuestionController extends Controller
         $question->delete();
 
         return redirect()->route('questions.index')->with('success', 'Question '. $question->id .' deleted.');
+    }
+
+    /**
+     * Method to sync the many to many relationship for an string of tags.
+     *
+     * @param string|null  $tags
+     * @param  \App\Question $question
+     * @return void
+     */
+    protected function saveTags($tags = null, Question $question) {
+        if (empty($tags)) {
+            $tags = "";
+        }
+        $tags = explode(",", $tags);
+        $tags_sync = [];
+        foreach($tags as $tag_name) {
+            if (!empty($tag_name)) {
+                $tag = Tag::firstOrCreate([ "tag_name" => trim($tag_name)]);
+                $tags_sync[] = $tag->id;
+            }
+        }
+
+        $question->tags()->sync($tags_sync);
     }
 }

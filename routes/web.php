@@ -21,7 +21,7 @@ Auth::routes();
 Route::middleware(['auth'])->prefix('admin')->group(function() {
     Route::get('/', 'AdminController@index')->name('admin');
     
-    Route::resource('/users', 'UserController');
+    Route::resource('/users', 'UserController', ['except', ['destroy']]);
     Route::prefix('/users')->group(function() {
         Route::post('/inactivate/{user}', 'UserController@inactivate')->name('users.inactivate');
 
@@ -31,4 +31,6 @@ Route::middleware(['auth'])->prefix('admin')->group(function() {
     Route::resource('/categories', 'CategoryController');
 
     Route::resource('/questions', 'QuestionController');
+
+    Route::resource('/tags', 'TagController', ['only' => ['index', 'show', 'destroy']]);
 });
