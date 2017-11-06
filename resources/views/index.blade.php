@@ -1,94 +1,66 @@
-<!doctype html>
-<html lang="{{ app()->getLocale() }}">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.app')
 
-        <title>Laravel</title>
-
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
-
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/admin') }}">Admin</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-                    @endauth
-                </div>
-            @endif
-
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
-
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+@section('content')
+    <h1 class="display-3 text-center">rFAQ</h1>
+    <form method="GET">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for question..." aria-label="Search for question..." name="search" value="{{ app('request')->input('search') }}">
+            <select id="category_id" class="form-control custom-select" name="category_id">
+                <option value="">Select an Category</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}" {{ app('request')->input('category_id') == $category->id ? "selected" : ""}}>{{ $category->category_name }}</option>
+                @endforeach
+            </select>
+            <span class="input-group-btn">
+                <button class="btn btn-secondary" type="submit">Go!</button>
+            </span>
+        </div>
+    </form>
+    <hr />
+    <h2 class="text-center">Top tags</h2>
+    <div class="row">
+        @foreach ($tags as $tag)
+            <div class="col-sm-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ $tag->tag_name }}</h4>
+                        <h6 class="card-subtitle mb-2 text-muted">Count: {{ $tag->questions_count }}</h6>
+                        <a href="#" class="btn btn-primary">Questions</a>
+                    </div>
                 </div>
             </div>
+        @endforeach
+    </div>
+
+    <br />
+    <hr />
+    <br />
+
+    <h2 class="text-center">Questions and Answers</h2>
+    @foreach ($questions as $question)
+        <div class="card">
+            <div class="card-header">
+                {{ $question->category->category_name}}
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                <p>Q: {{ $question->question_text }}</p>
+                <footer class="blockquote-footer">A: {{ $question->answer->answer_text }}</footer>
+                </blockquote>
+                @if ($question->tags->count() > 0)
+                    <br />
+                    Tags:
+                @endif
+                @foreach ($question->tags as $tag)
+                    <a href="#" class="card-link">{{$tag->tag_name}}</a> {{$loop->last ? "" : ", "}}
+                @endforeach
+            </div>
         </div>
-    </body>
-</html>
+        <hr />
+    @endforeach
+
+    <div class="d-flex justify-content-center">
+        {{ $questions->links('vendor.pagination.bootstrap-4') }}
+    </div>
+@endsection
+

@@ -17,7 +17,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <!-- Branding Image -->
-        @if(url()->current() != route('admin'))
+        @if(url()->current() != route('admin') && auth()->user())
             <a class="navbar-brand" href="{{ route('admin') }}">
                 rFAQ Admin
             </a>
@@ -66,7 +66,7 @@
             @auth
                 @include('admin.sidebar')
             @endauth
-            <main class="col-sm-9 ml-sm-auto col-md-10 pt-3" role="main">
+            <main class="col-sm-9 ml-sm-auto {{ auth()->user() ? 'col-md-10' : 'col-md-12' }} pt-3" role="main">
                 @include('layouts.message.success')
                 @include('layouts.message.error')
                 @yield('content')
