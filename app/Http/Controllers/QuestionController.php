@@ -29,7 +29,7 @@ class QuestionController extends Controller
         $questions = $questions->paginate(15)
                                ->appends($request->input());
 
-        return view('admin.questions.index', compact('questions', $questions));
+        return view('admin.questions.index', compact('questions'));
     }
 
     /**
@@ -40,7 +40,7 @@ class QuestionController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('admin.questions.form', compact('categories', $categories));
+        return view('admin.questions.form', compact('categories'));
     }
 
     /**

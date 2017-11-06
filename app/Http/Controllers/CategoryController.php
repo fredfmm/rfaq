@@ -25,7 +25,7 @@ class CategoryController extends Controller
         $categories = $categories->paginate(15)
                                  ->appends($request->input());
 
-        return view('admin.categories.index', compact('categories', $categories));
+        return view('admin.categories.index', compact('categories'));
     }
 
     /**
@@ -70,7 +70,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('admin.categories.form', compact('category', $category));
+        return view('admin.categories.form', compact('category'));
     }
 
     /**

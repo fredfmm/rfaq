@@ -24,7 +24,7 @@ class TagController extends Controller
 
         $tags = $tags->paginate(15)
                      ->appends($request->input());
-        return view('admin.tags.index', compact('tags', $tags));
+        return view('admin.tags.index', compact('tags'));
     }
 
     /**
