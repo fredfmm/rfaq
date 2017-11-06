@@ -24,7 +24,10 @@ class SaveQuestionRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            "category_id"   => "exists:categories,id",
+            "tags"          => "string|regex:/^([a-z0-9]+(,\s){0,1})+([a-z0-9,\s])$/",
+            "question_text" => "string|required",
+            "answer_text"   => "string|required"
         ];
     }
 }
